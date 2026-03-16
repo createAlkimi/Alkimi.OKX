@@ -671,7 +671,7 @@ const LINES = [
   {geo:'NL', color:'#FF6B6B', fmt:'crypto', tag:'Crypto', t:'Display — Crypto Native', cpm:5.50, view:0.70, vtr:0.95, ctr:0.0015, r:0.25},
   {geo:'DE', color:'#00E87B', fmt:'crypto', tag:'Crypto', t:'Display — Crypto Native', cpm:8.50, view:0.70, vtr:0.95, ctr:0.0015, r:0.25},
 ];
-const AV_RATIO = 0.10, AV_CPM = 33;
+const AV_RATIO = 0.10;
 
 // ── FORMATTERS ────────────────────────────────────────────────────────
 const $f = v => '$' + Math.round(v).toLocaleString('en-US');
@@ -768,7 +768,9 @@ function render(budget) {
 
   if (avPct > 0) {
     const avBudget = budget * avPct;
-    const avI = (avBudget / AV_CPM) * 1000;
+    // Harmonic mean CPM — equivalent to equal budget split across all 4 countries
+    const blendedCpm = LINES.length / LINES.reduce((sum, l) => sum + (1 / l.cpm), 0);
+    const avI = (avBudget / blendedCpm) * 1000;
     totImp += avI;
 
     geoSep(body, 'ADDED VALUE', 'var(--alkimi-green)');
@@ -777,12 +779,12 @@ function render(budget) {
     avTr.className = 'row-av';
     mkTd(avTr, '');
     mkTd(avTr, '<span class="tag tag--av">Added Value</span>', true);
-    const avDescTd = mkTd(avTr, 'Alkimi Added Value — Premium CTV Bonus');
+    const avDescTd = mkTd(avTr, 'Alkimi Added Value — Display Impressions');
     avDescTd.style.textAlign = 'left';
     mkTd(avTr, 'CPM');
-    mkTd(avTr, cp(AV_CPM));
-    mkTd(avTr, '95.00%');
-    mkTd(avTr, 'n/a').style.color = 'var(--alkimi-grey-mid)';
+    mkTd(avTr, cp(blendedCpm));
+    mkTd(avTr, '70.00%');
+    mkTd(avTr, '0.15%');
     const avImpTd = mkTd(avTr, im(avI));
     avImpTd.style.color = 'var(--alkimi-green)';
     const avInvTd = mkTd(avTr, `${(avPct * 100)}% AV (${$f(avBudget)})`);
